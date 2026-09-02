@@ -1,0 +1,8 @@
+# 쇼핑레이더
+
+쇼핑레이더는 쿠팡 파트너스 API의 카테고리별 베스트 상품을 정리하는 비공식 정보 사이트입니다.
+쿠팡 전체 판매량 순위가 아닙니다. 리뷰 원문은 복제하지 않으며 상품 페이지로 연결합니다.
+
+Home: https://kimjunnem.github.io/shopping-radar/
+AI index: https://kimjunnem.github.io/shopping-radar/data/ai-index.json
+Sitemap: https://kimjunnem.github.io/shopping-radar/sitemap.xml
