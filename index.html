@@ -3,95 +3,114 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>쇼핑레이더 | 오늘의 인기상품 100</title>
-  <meta name="description" content="카테고리별 인기상품을 한곳에서 비교하고 상품 정보를 확인하세요.">
-
+  <meta name="theme-color" content="#111827">
+  <title>쇼핑레이더 | 인기상품·가격 비교·단위가격 계산</title>
+  <meta name="description" content="카테고리별 인기상품과 가격을 보기 쉽게 정리하고, 단위가격 계산기로 실제 가성비를 비교하는 쇼핑 정보 서비스입니다.">
+  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="canonical" href="https://kimjunnem.github.io/shopping-radar/">
-  <link rel="stylesheet" href="https://kimjunnem.github.io/shopping-radar/style.css">
-
-  <script async
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4192319901350402"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="style.css">
+  <meta name="google-adsense-account" content="ca-pub-4192319901350402">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4192319901350402" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"쇼핑레이더","url":"https://kimjunnem.github.io/shopping-radar/","description":"인기상품과 가격을 비교하는 쇼핑 정보 서비스"}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"쇼핑레이더의 순위는 쿠팡 전체 판매량 순위인가요?","acceptedAnswer":{"@type":"Answer","text":"아닙니다. API 연결 후 표시되는 순위는 쿠팡 파트너스 API가 제공하는 카테고리별 베스트 목록을 기준으로 합니다."}},
+    {"@type":"Question","name":"표시된 가격이 실제 결제 가격과 같나요?","acceptedAnswer":{"@type":"Answer","text":"가격과 배송 조건은 조회 시점의 정보이며 쿠팡 결제 화면에서 달라질 수 있으므로 최종 결제 화면을 확인해야 합니다."}},
+    {"@type":"Question","name":"kg과 g, L와 ml도 비교할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"네. 계산기가 kg을 g으로, L를 ml로 환산해 같은 종류의 단위가격을 비교합니다."}}
+  ]}
+  </script>
 </head>
-
 <body>
-
 <header class="top">
   <div class="wrap nav">
-    <a class="brand" href="https://kimjunnem.github.io/shopping-radar/">쇼핑레이더</a>
-    <nav>
-      <a href="#popular">인기상품</a>
-      <a href="#categories">카테고리</a>
-      <a href="about.html">사이트 안내</a>
-    </nav>
+    <a class="brand" href="./" aria-label="쇼핑레이더 홈">쇼핑레이더</a>
+    <nav aria-label="주요 메뉴"><a href="#calculator">단위가격 계산</a><a href="#checklist">구매 체크</a><a href="#guide">비교 방법</a><a href="#faq">FAQ</a></nav>
   </div>
 </header>
-
-<main class="wrap">
-
+<main>
   <section class="hero">
-    <p class="eyebrow">매일 업데이트 예정</p>
-    <h1>오늘의 인기상품을 확인하세요</h1>
-    <p>
-      쇼핑레이더는 인기상품과 가격 정보를 보기 쉽게 정리하는 쇼핑 정보 사이트입니다.
-    </p>
-
-    <a class="btn large"
-       href="https://link.coupang.com/a/gICzFN2voO"
-       target="_blank"
-       rel="nofollow sponsored">
-      쿠팡에서 인기상품 보기
-    </a>
-
-    <p class="fine">
-      이 포스팅은 쿠팡 파트너스 활동의 일환으로,
-      이에 따른 일정액의 수수료를 제공받을 수 있습니다.
-    </p>
-  </section>
-
-  <section id="categories">
-    <h2>카테고리</h2>
-    <div class="chips">
-      <span class="muted">API 연결 후 카테고리별 인기상품이 자동으로 표시됩니다.</span>
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">SHOPPING DATA & TOOLS</p>
+        <h1>많이 찾는 상품,<br>가격까지 따져보고 고르세요.</h1>
+        <p class="lead">인기상품을 보기 좋게 정리하고, 같은 제품이라도 용량·수량이 다를 때 실제 단위가격까지 비교할 수 있게 만들었습니다.</p>
+        <div class="hero-actions">
+          <a class="primary" href="https://link.coupang.com/a/gICzFN2voO" target="_blank" rel="nofollow sponsored noopener">쿠팡 인기상품 보기</a>
+          <a class="secondary" href="#calculator">단위가격 계산하기</a>
+        </div>
+        <p class="disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받을 수 있습니다.</p>
+      </div>
+      <div class="status-card"><span class="status-dot"></span><div><b id="dataStatus">상품 데이터 연결 준비 중</b><p id="dataUpdated">API 최종 승인 전에는 순위를 임의로 만들지 않습니다.</p></div></div>
     </div>
   </section>
 
-  <section class="empty">
-    <h2>인기상품 데이터 연결 준비 중</h2>
-    <p>
-      쿠팡 파트너스 API 사용이 가능해지면
-      카테고리별 인기상품과 상품 정보를 매일 자동으로 갱신할 예정입니다.
-    </p>
-  </section>
-
-  <section id="popular">
-    <div class="section-title">
-      <h2>인기상품</h2>
-      <p>API 연결 후 상품 목록이 표시됩니다.</p>
-    </div>
-    <div class="grid"></div>
-  </section>
-
-</main>
-
-<footer>
   <div class="wrap">
-    <p class="disclosure">
-      이 포스팅은 쿠팡 파트너스 활동의 일환으로,
-      이에 따른 일정액의 수수료를 제공받을 수 있습니다.
-    </p>
+    <section class="trust-strip">
+      <div><b>순위 과장 없음</b><span>전체 판매량 TOP100이라고 표시하지 않습니다.</span></div>
+      <div><b>후기 원문 복제 없음</b><span>최신 후기는 상품 페이지에서 직접 확인합니다.</span></div>
+      <div><b>가격 비교 도구</b><span>용량·개수 차이를 단위가격으로 계산합니다.</span></div>
+    </section>
 
-    <p>
-      상품 가격과 배송 조건은 쿠팡의 실제 상품 페이지에서 확인해 주세요.
-    </p>
+    <section id="ranking" class="section">
+      <div class="section-head"><div><p class="eyebrow">POPULAR PRODUCTS</p><h2>카테고리 인기상품</h2></div><span id="rankingNote">API 연결 후 매일 자동으로 갱신됩니다.</span></div>
+      <div id="categoryChips" class="chips"></div>
+      <div id="productGrid" class="grid"></div>
+      <div id="emptyState" class="empty-state">
+        <b>아직 API 데이터가 연결되지 않았어요.</b>
+        <p>최종 승인 전에는 임의의 상품 순위를 채우지 않습니다. 대신 아래 가격 계산기는 지금 바로 사용할 수 있습니다.</p>
+        <a href="https://link.coupang.com/a/gICzFN2voO" target="_blank" rel="nofollow sponsored noopener">쿠팡 인기상품 직접 보기 →</a>
+      </div>
+    </section>
 
-    <p>
-      <a href="about.html">사이트 안내</a> ·
-      <a href="privacy.html">개인정보처리방침</a> ·
-      <a href="disclaimer.html">면책 안내</a>
-    </p>
+    <section id="calculator" class="section tool-section" aria-labelledby="calculatorTitle">
+      <div class="section-head"><div><p class="eyebrow">UNIT PRICE CALCULATOR</p><h2 id="calculatorTitle">어느 쪽이 진짜 싼지 계산</h2></div><span>서로 환산 가능한 단위끼리 비교합니다.</span></div>
+      <div class="calculator">
+        <div class="calc-card"><h3>상품 A</h3><label for="aPrice">가격(원)</label><input id="aPrice" class="price-input" inputmode="numeric" autocomplete="off" placeholder="예: 12,900" aria-describedby="calcHelp"><label for="aQty">총 용량/수량</label><div class="qty-row"><input id="aQty" inputmode="decimal" autocomplete="off" placeholder="예: 2"><select id="aUnit" aria-label="상품 A 단위"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="L">L</option><option value="개">개</option><option value="매">매</option></select></div><strong id="aResult" aria-live="polite">-</strong></div>
+        <div class="calc-card"><h3>상품 B</h3><label for="bPrice">가격(원)</label><input id="bPrice" class="price-input" inputmode="numeric" autocomplete="off" placeholder="예: 15,900" aria-describedby="calcHelp"><label for="bQty">총 용량/수량</label><div class="qty-row"><input id="bQty" inputmode="decimal" autocomplete="off" placeholder="예: 3"><select id="bUnit" aria-label="상품 B 단위"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="L">L</option><option value="개">개</option><option value="매">매</option></select></div><strong id="bResult" aria-live="polite">-</strong></div>
+      </div>
+      <p id="calcHelp" class="calc-help">묶음은 낱개 용량 × 개수를 먼저 계산해 총량을 입력하세요. 예: 500ml × 6개 → 3000ml</p>
+      <div id="calcWinner" class="calc-winner" role="status" aria-live="polite">가격과 용량을 입력하면 더 저렴한 쪽을 알려드립니다.</div>
+    </section>
+
+    <section id="checklist" class="section">
+      <div class="section-head"><div><p class="eyebrow">SHOPPING CHECKLIST</p><h2>쇼핑 전 체크리스트</h2></div><button id="resetChecklist" class="text-button" type="button">체크 초기화</button></div>
+      <div class="checklist" aria-label="쇼핑 전 확인 항목">
+        <label><input type="checkbox" data-check="option"> 상품명뿐 아니라 용량·수량·모델·옵션이 같은가요?</label>
+        <label><input type="checkbox" data-check="unit"> 총액이 아닌 100g·100ml·1개(매)당 가격을 비교했나요?</label>
+        <label><input type="checkbox" data-check="shipping"> 배송비와 도착 예정일을 확인했나요?</label>
+        <label><input type="checkbox" data-check="need"> 소비기한 안에 쓸 수 있는 양인가요?</label>
+        <label><input type="checkbox" data-check="final"> 결제 화면의 최종 가격과 판매자를 확인했나요?</label>
+      </div>
+      <p id="checkProgress" class="check-progress" aria-live="polite">0 / 5 확인</p>
+    </section>
+
+    <section id="guide" class="section">
+      <div class="section-head"><div><p class="eyebrow">BUYING CHECKLIST</p><h2>구매 전에 이 네 가지만 확인</h2></div></div>
+      <div class="check-grid">
+        <article><b>1. 단위가격</b><p>묶음 수량이 많다고 항상 싼 건 아닙니다. 100g·100ml·1개당 가격으로 비교하세요.</p></article>
+        <article><b>2. 배송 조건</b><p>로켓배송, 무료배송 여부와 도착 예정일은 결제 직전 다시 확인하세요.</p></article>
+        <article><b>3. 옵션 차이</b><p>같은 상품명이어도 용량·색상·세대·구성품이 다를 수 있습니다.</p></article>
+        <article><b>4. 최신 후기</b><p>오래된 후기보다 최근 후기에서 포장·품질·구성 변경 여부를 확인하는 편이 좋습니다.</p></article>
+      </div>
+      <div class="tips">
+        <article><h3>가격 비교 방법</h3><ol><li>비교할 상품의 옵션을 동일하게 맞춥니다.</li><li>가격을 총 g·ml·개·매로 나눕니다.</li><li>배송비와 쿠폰 조건까지 포함한 결제 금액을 확인합니다.</li></ol></article>
+        <article><h3>묶음상품 비교 팁</h3><p><b>낱개 용량 × 묶음 수량</b>으로 총량을 구하세요. 500ml 6병은 3,000ml이며, 많이 살수록 보관 공간과 소비기한도 함께 확인해야 합니다.</p></article>
+      </div>
+    </section>
+
+    <section id="faq" class="section faq">
+      <div class="section-head"><div><p class="eyebrow">ABOUT THE DATA</p><h2>데이터 표시 기준</h2></div></div>
+      <details open><summary>왜 지금 상품이 비어 있나요?</summary><p>쿠팡 파트너스 API 최종 승인 전이기 때문입니다. 승인 전에는 판매량이나 인기순위를 임의로 추정하지 않습니다.</p></details>
+      <details><summary>API가 열리면 무엇이 달라지나요?</summary><p>카테고리별 베스트 상품, 가격, 상품 이미지, 순위 변동을 자동 저장하고 상품별 상세 페이지와 카테고리 페이지를 매일 갱신합니다.</p></details>
+      <details><summary>가격은 실시간인가요?</summary><p>API를 마지막으로 조회한 시점 기준입니다. 쿠팡에서 가격이 바뀌면 실제 결제 가격과 차이가 날 수 있습니다.</p></details>
+      <details><summary>kg과 g, L와 ml도 비교할 수 있나요?</summary><p>네. 계산기가 kg을 g으로, L를 ml로 환산해 같은 종류의 단위가격을 비교합니다.</p></details>
+    </section>
   </div>
-</footer>
-
+</main>
+<footer><div class="wrap footer"><div><b>쇼핑레이더</b><p>인기상품·가격 비교를 돕는 비공식 쇼핑 정보서비스</p></div><div><a href="about.html">사이트 안내</a><a href="privacy.html">개인정보처리방침</a><a href="disclaimer.html">면책 안내</a></div></div></footer>
+<script src="app.js"></script>
 </body>
 </html>

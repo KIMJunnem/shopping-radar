@@ -1,0 +1,38 @@
+name: Update shopping data
+on:
+  schedule:
+    - cron: '10 23 * * *' # 매일 오전 8:10 KST
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shopping-radar-update
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Update Coupang product data
+        env:
+          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+          COUPANG_SUB_ID: ${{ secrets.COUPANG_SUB_ID }}
+        run: |
+          if [ -z "$COUPANG_ACCESS_KEY" ] || [ -z "$COUPANG_SECRET_KEY" ]; then
+            echo "Coupang API keys are not configured; preserving existing data."
+            exit 0
+          fi
+          python scripts/update_products.py
+      - name: Generate category and product pages
+        run: python scripts/generate_pages.py
+      - name: Commit generated site
+        run: |
+          git config user.name "shopping-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: update shopping radar"
+          git push
