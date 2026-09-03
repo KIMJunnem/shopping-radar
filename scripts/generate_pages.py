@@ -16,6 +16,13 @@ def esc(v): return html.escape(str(v or ""),quote=True)
 def money(v):
     try:return f"{int(float(v)):,}원"
     except:return "가격 확인"
+def trend(v):
+    state=v.get("trend")
+    change=v.get("rank_change")
+    if state=="new":return "신규 진입"
+    if state=="up":return f"{abs(int(change or 0))}계단 상승"
+    if state=="down":return f"{abs(int(change or 0))}계단 하락"
+    return "변동 없음"
 def slug(v):
     s=re.sub(r"[^0-9A-Za-z가-힣]+","-",str(v)).strip("-")
     return s or "category"
@@ -54,7 +61,7 @@ def main():
         cards=[]
         for x in arr[:100]:
             img=f'<img loading="lazy" src="{esc(x.get("image"))}" alt="{esc(x.get("name"))}">' if x.get("image") else ""
-            cards.append(f'''<article class="card"><a class="card-img" href="{BASE}/product/{esc(x.get("product_id"))}.html">{img}</a><div class="card-body"><div class="rank">{esc(x.get("rank"))}위</div><h3><a href="{BASE}/product/{esc(x.get("product_id"))}.html">{esc(x.get("name"))}</a></h3><div class="price">{money(x.get("price"))}</div><a class="primary" target="_blank" rel="nofollow sponsored noopener" href="{esc(x.get("url"))}">쿠팡에서 확인</a></div></article>''')
+            cards.append(f'''<article class="card"><a class="card-img" href="{BASE}/product/{esc(x.get("product_id"))}.html">{img}</a><div class="card-body"><div class="rank">{esc(x.get("rank"))}위 <small>{esc(trend(x))}</small></div><div class="category">{esc(x.get("category"))}</div><h3><a href="{BASE}/product/{esc(x.get("product_id"))}.html">{esc(x.get("name"))}</a></h3><div class="price">{money(x.get("price"))}</div><a class="primary" target="_blank" rel="nofollow sponsored noopener" href="{esc(x.get("url"))}">쿠팡에서 보기</a></div></article>''')
         body=f'''<main class="wrap product-page"><div class="breadcrumb"><a href="{BASE}/">홈</a> &gt; 카테고리</div><p class="eyebrow">CATEGORY BEST</p><h1>{esc(name)} 인기상품</h1><p class="lead">해당 카테고리 API 베스트 목록의 순서이며 쿠팡 전체 판매량 순위는 아닙니다.</p><div class="grid">{''.join(cards)}</div></main>'''
         page=head(f"{name} 인기상품 | 쇼핑레이더",f"{name} 카테고리 인기상품과 가격을 확인하세요.",f"{BASE}/category/{enc(slug(name))}.html")+body+foot()
         (ROOT/"category"/f"{slug(name)}.html").write_text(page,encoding="utf-8")
@@ -67,7 +74,7 @@ def main():
         if not pid:continue
         t10,app=history(pid,x.get("category_id"))
         img=f'<img src="{esc(x.get("image"))}" alt="{esc(x.get("name"))}">' if x.get("image") else ""
-        body=f'''<main class="wrap product-page"><div class="breadcrumb"><a href="{BASE}/">홈</a> &gt; <a href="{BASE}/category/{enc(slug(x.get("category")))}.html">{esc(x.get("category"))}</a></div><section class="product-box"><div>{img}</div><div><p class="eyebrow">{esc(x.get("category"))} {esc(x.get("rank"))}위</p><h1>{esc(x.get("name"))}</h1><div class="price">{money(x.get("price"))}</div><div class="facts"><div><span>최근 30일 TOP10</span><b>{t10}일</b></div><div><span>최근 30일 등장</span><b>{app}일</b></div><div><span>배송</span><b>{"로켓배송" if x.get("is_rocket") else "상품 페이지 확인"}</b></div></div><a class="primary" target="_blank" rel="nofollow sponsored noopener" href="{esc(x.get("url"))}">쿠팡에서 상품·후기 보기</a><p class="disclosure">리뷰 원문은 복제하지 않습니다. 최신 후기는 쿠팡 상품 페이지에서 확인하세요.</p></div></section></main>'''
+        body=f'''<main class="wrap product-page"><div class="breadcrumb"><a href="{BASE}/">홈</a> &gt; <a href="{BASE}/category/{enc(slug(x.get("category")))}.html">{esc(x.get("category"))}</a></div><section class="product-box"><div>{img}</div><div><p class="eyebrow">{esc(x.get("category"))} 카테고리 인기상품</p><h1>{esc(x.get("name"))}</h1><div class="price">{money(x.get("price"))}</div><div class="facts"><div><span>현재 카테고리 순위</span><b>{esc(x.get("rank"))}위</b></div><div><span>전일 대비 순위</span><b>{esc(trend(x))}</b></div><div><span>최근 30일 TOP10</span><b>{t10}일</b></div><div><span>가격</span><b>{money(x.get("price"))}</b></div><div><span>배송 정보</span><b>{"로켓배송" if x.get("is_rocket") else "상품 페이지 확인"}</b></div></div><a class="primary" target="_blank" rel="nofollow sponsored noopener" href="{esc(x.get("url"))}">쿠팡에서 상품·후기 보기</a><p class="disclosure">가격과 배송 조건은 바뀔 수 있습니다. 최신 정보와 후기는 쿠팡 상품 페이지에서 확인하세요.</p></div></section></main>'''
         page=head(f'{x.get("name")} 가격·인기순위 | 쇼핑레이더',f'{x.get("name")}의 현재 가격과 카테고리 인기순위를 확인하세요.',f'{BASE}/product/{pid}.html')+body+foot()
         (ROOT/"product"/f"{pid}.html").write_text(page,encoding="utf-8")
 
