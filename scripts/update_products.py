@@ -5,10 +5,11 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
@@ -100,13 +101,30 @@ def normalize(raw: dict, category_id: str, category_name: str, rank: int) -> dic
         "category_id": category_id,
         "category": category_name,
         "rank": rank,
-        "name": str(raw.get("productName") or raw.get("name") or "상품명 미제공").strip(),
+        "name": str(raw.get("productName") or raw.get("name") or "").strip(),
         "price": raw.get("productPrice") if raw.get("productPrice") is not None else raw.get("price"),
         "image": str(raw.get("productImage") or raw.get("imageUrl") or "").strip(),
         "url": str(raw.get("productUrl") or raw.get("url") or "").strip(),
         "is_rocket": bool(raw.get("isRocket", False)),
         "is_free_shipping": bool(raw.get("isFreeShipping", False)),
     }
+
+
+def valid_product(item: dict) -> bool:
+    try:
+        rank = int(item.get("rank"))
+    except (TypeError, ValueError):
+        return False
+    parsed = urlparse(str(item.get("url") or ""))
+    product_id = str(item.get("product_id") or "").strip()
+    return bool(
+        re.fullmatch(r"[0-9A-Za-z_-]+", product_id)
+        and str(item.get("name") or "").strip()
+        and str(item.get("category") or "").strip()
+        and rank > 0
+        and parsed.scheme in {"http", "https"}
+        and parsed.netloc
+    )
 
 
 def previous_rank_map(previous: dict) -> dict[tuple[str, str], int]:
@@ -144,6 +162,44 @@ def save_history(payload: dict) -> None:
         old.unlink(missing_ok=True)
 
 
+def add_history_summary(items: list[dict]) -> None:
+    today = datetime.now(KST).date()
+    history_files = sorted(HISTORY_DIR.glob("*.json"))[-29:]
+    history_rows = [(path.stem, read_json(path, {})) for path in history_files]
+    for item in items:
+        records = {}
+        key = (str(item.get("category_id") or ""), str(item.get("product_id") or ""))
+        for day, payload in history_rows:
+            match = next(
+                (
+                    row for row in payload.get("items", [])
+                    if (str(row.get("category_id") or ""), str(row.get("product_id") or "")) == key
+                ),
+                None,
+            )
+            if match:
+                records[day] = match
+        records[today.isoformat()] = item
+        ordered = sorted(records.items())[-30:]
+        item["appearances_30d"] = len(ordered)
+        item["top10_count_30d"] = sum(
+            1 for _, row in ordered if isinstance(row.get("rank"), int) and row["rank"] <= 10
+        )
+        prices = {}
+        for day, row in ordered:
+            try:
+                price = float(row.get("price"))
+            except (TypeError, ValueError):
+                continue
+            if price > 0:
+                prices[day] = price
+        item["price_history_days"] = len(prices)
+        item["price_history_start"] = min(prices) if prices else None
+        item["price_yesterday"] = prices.get((today - timedelta(days=1)).isoformat())
+        item["price_7_days_ago"] = prices.get((today - timedelta(days=7)).isoformat())
+        item["lowest_price_30d"] = min(prices.values()) if len(prices) >= 2 else None
+
+
 def main() -> int:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     previous = read_json(PRODUCTS_FILE, {"categories": [], "items": []})
@@ -165,10 +221,16 @@ def main() -> int:
         try:
             raw_items = fetch_category(category_id, access_key, secret_key, sub_id)
             normalized = [normalize(raw, category_id, category_name, i + 1) for i, raw in enumerate(raw_items)]
-            normalized = [x for x in normalized if x["product_id"] and x["url"]]
-            all_items.extend(normalized)
-            category_status.append({"id": category_id, "name": category_name, "count": len(normalized), "ok": True})
-            print(f"{category_name}: {len(normalized)}")
+            normalized = [x for x in normalized if valid_product(x)]
+            if normalized:
+                all_items.extend(normalized)
+                category_status.append({"id": category_id, "name": category_name, "count": len(normalized), "ok": True})
+                print(f"{category_name}: {len(normalized)}")
+            else:
+                fallback = old_by_category.get(category_id, [])
+                all_items.extend(fallback)
+                category_status.append({"id": category_id, "name": category_name, "count": len(fallback), "ok": False})
+                print(f"WARN {category_name}: no valid products; preserved {len(fallback)} old items")
         except Exception as exc:
             fallback = old_by_category.get(category_id, [])
             all_items.extend(fallback)
@@ -177,6 +239,7 @@ def main() -> int:
         time.sleep(0.12)
 
     add_trend(all_items, previous)
+    add_history_summary(all_items)
     now = datetime.now(KST).isoformat(timespec="seconds")
     payload = {
         "updated_at": now,
